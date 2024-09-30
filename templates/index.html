@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cliente-Servidor de Imágenes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(to bottom right, rgba(0, 0, 0, 0.9), rgba(50, 50, 50, 0.9)); /* Fondo degradado oscuro */
+            color: white; /* Color del texto blanco */
+            font-family: 'Arial', sans-serif; /* Fuente moderna */
+            text-align: center; /* Alinear texto al centro */
+            padding: 50px; /* Espaciado */
+            min-height: 100vh; /* Asegurarse de que el fondo ocupe toda la pantalla */
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5); /* Sombra interna */
+        }
+        h1 {
+            font-size: 2.5em; /* Tamaño de letra grande para el título */
+            margin-bottom: 20px; /* Espacio inferior */
+        }
+        input[type="text"] {
+            padding: 10px;
+            font-size: 1.5em; /* Tamaño de letra más grande para el input */
+            border: 2px solid #fff; /* Borde blanco */
+            border-radius: 5px; /* Bordes redondeados */
+            width: 300px; /* Ancho del input */
+            margin-bottom: 20px; /* Espacio inferior */
+            transition: border-color 0.3s; /* Transición suave para el borde */
+        }
+        input[type="text"]:focus {
+            border-color: #007BFF; /* Color de borde al enfocar */
+            outline: none; /* Sin contorno */
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1.5em; /* Tamaño de letra más grande para el botón */
+            background-color: #007BFF; /* Color de fondo del botón */
+            color: white; /* Color del texto del botón */
+            border: none; /* Sin borde */
+            border-radius: 5px; /* Bordes redondeados */
+            cursor: pointer; /* Cambiar el cursor al pasar el ratón */
+            transition: background-color 0.3s, transform 0.2s; /* Transición suave para el color de fondo y transformaciones */
+            margin: 10px; /* Espacio entre botones */
+        }
+        button:hover {
+            background-color: #0056b3; /* Color del botón al pasar el ratón */
+            transform: scale(1.05); /* Aumentar ligeramente el tamaño del botón */
+        }
+        #imageDisplay {
+            width: 640px; /* Ancho de la imagen */
+            height: 360px; /* Altura de la imagen */
+            object-fit: cover; /* Mantener la proporción de la imagen */
+            display: none; /* Esconder la imagen por defecto */
+            border-radius: 5px; /* Bordes redondeados para la imagen */
+            margin: 20px auto; /* Espacio arriba y centrado horizontalmente */
+        }
+        .clear-button {
+            background-color: #dc3545; /* Color de fondo del botón de limpiar */
+        }
+        .clear-button:hover {
+            background-color: #c82333; /* Color del botón de limpiar al pasar el ratón */
+            transform: scale(1.05); /* Aumentar ligeramente el tamaño del botón */
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+    <script type="text/javascript">
+        var socket;
+
+        window.onload = function() {
+            socket = io.connect('http://' + document.domain + ':' + location.port);
+            
+            // Escuchar el mensaje con la imagen
+            socket.on('send_image', function(data) {
+                var imageDisplay = document.getElementById('imageDisplay');
+                if (data.image_path) {
+                    imageDisplay.src = data.image_path;  // Mostrar la imagen
+                    imageDisplay.style.display = 'block'; // Hacer visible la imagen
+                } else {
+                    alert('Imagen no encontrada');
+                    clearInput(); // Limpiar el input si no se encuentra la imagen
+                }
+            });
+        };
+
+        function requestImage() {
+            var objectName = document.getElementById('objectName').value;
+            socket.emit('request_image', objectName);  // Enviar solicitud de imagen
+        }
+
+        function clearInput() {
+            document.getElementById('objectName').value = ''; // Limpiar el texto del input
+            var imageDisplay = document.getElementById('imageDisplay');
+            imageDisplay.style.display = 'none'; // Esconder la imagen
+        }
+    </script>
+</head>
+<body>
+    <h1>Solicitar Imagen de un Objeto</h1>
+    <input type="text" id="objectName" placeholder="Escribe el nombre del objeto...">
+    <button onclick="requestImage()">Enviar</button>
+    
+    <img id="imageDisplay" src="" alt="Imagen del objeto"/>
+    
+    <button class="clear-button" onclick="clearInput()">Limpiar Texto</button>
+</body>
+</html>
+
