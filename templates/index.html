@@ -48,9 +48,9 @@
             transform: scale(1.05); /* Aumentar ligeramente el tamaño del botón */
         }
         #imageDisplay {
-            width: 640px; /* Ancho de la imagen */
-            height: 360px; /* Altura de la imagen */
-            object-fit: cover; /* Mantener la proporción de la imagen */
+            max-width: 100%; /* Ancho máximo del 100% del contenedor */
+            max-height: 80vh; /* Altura máxima del 80% de la ventana */
+            object-fit: contain; /* Mantener la proporción de la imagen */
             display: none; /* Esconder la imagen por defecto */
             border-radius: 5px; /* Bordes redondeados para la imagen */
             margin: 20px auto; /* Espacio arriba y centrado horizontalmente */
@@ -100,9 +100,8 @@
     <input type="text" id="objectName" placeholder="Escribe el nombre del objeto...">
     <button onclick="requestImage()">Enviar</button>
     
-    <img id="imageDisplay" src="" alt="Imagen del objeto"/>
+    <img id="imageDisplay" src="" alt="Imagen del objeto" style="display: none;"/>
     
     <button class="clear-button" onclick="clearInput()">Limpiar Texto</button>
 </body>
 </html>
-
