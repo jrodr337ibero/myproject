@@ -58,6 +58,11 @@
         .clear-button {
             background-color: #dc3545; /* Color de fondo del botón de limpiar */
         }
+        .btn-descargar {
+            background-color: grey; /* Color de fondo del botón de limpiar */
+            margin-left: 500px;
+            text-align: center;
+        }
         .clear-button:hover {
             background-color: #c82333; /* Color del botón de limpiar al pasar el ratón */
             transform: scale(1.05); /* Aumentar ligeramente el tamaño del botón */
@@ -66,16 +71,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
     <script type="text/javascript">
         var socket;
-
+        var imagePath = '';
+        var nombre_archivo = ''
         window.onload = function() {
             socket = io.connect('http://' + document.domain + ':' + location.port);
             
             // Escuchar el mensaje con la imagen
             socket.on('send_image', function(data) {
                 var imageDisplay = document.getElementById('imageDisplay');
+                var downloadButton = document.getElementById('downloadButton');
                 if (data.image_path) {
+                    imagePath = data.image_path
                     imageDisplay.src = data.image_path;  // Mostrar la imagen
                     imageDisplay.style.display = 'block'; // Hacer visible la imagen
+                    downloadButton.style.display = 'block'; 
                 } else {
                     alert('Imagen no encontrada');
                     clearInput(); // Limpiar el input si no se encuentra la imagen
@@ -85,6 +94,8 @@
 
         function requestImage() {
             var objectName = document.getElementById('objectName').value;
+            imagePath = ''
+            nombre_archivo = objectName
             socket.emit('request_image', objectName);  // Enviar solicitud de imagen
         }
 
@@ -93,13 +104,25 @@
             var imageDisplay = document.getElementById('imageDisplay');
             imageDisplay.style.display = 'none'; // Esconder la imagen
         }
+        function downloadImage() {
+            console.log(imagePath)
+            var customFilename = nombre_archivo
+            var enlace = document.createElement('a');
+            var timestamp = new Date().getTime();
+            nombre_archivo = nombre_archivo + '_' + timestamp
+            enlace.href = `/download_image/${encodeURIComponent(imagePath)}/${customFilename}?t=${timestamp}`;
+            // enlace.target = '_blank';
+            enlace.download = '';
+            
+            enlace.click();
+        }
     </script>
 </head>
 <body>
     <h1>Solicitar Imagen de un Objeto</h1>
     <input type="text" id="objectName" placeholder="Escribe el nombre del objeto...">
-    <button onclick="requestImage()">Enviar</button>
-    
+    <button onclick="requestImage()">Buscar</button>
+    <button class="btn-descargar" id="downloadButton" style="display: none;" onclick="downloadImage()">Descargar Imagen</button>
     <img id="imageDisplay" src="" alt="Imagen del objeto" style="display: none;"/>
     
     <button class="clear-button" onclick="clearInput()">Limpiar Texto</button>
